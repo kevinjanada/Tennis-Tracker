@@ -12,6 +12,9 @@ class CourtLineDetector:
         self.model.fc = nn.Linear(self.model.fc.in_features, 14*2)
         self.model.load_state_dict(torch.load( model_path, map_location = self.DEVICE))
 
+        # Move model to the correct device
+        self.model.to(self.DEVICE)
+
         self.transforms = transforms.Compose([
             transforms.ToPILImage(),
             transforms.Resize((224,224)),

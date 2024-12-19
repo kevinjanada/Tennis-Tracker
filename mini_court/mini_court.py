@@ -202,6 +202,8 @@ class MiniCourt():
 
             output_player_bboxes_dict = {}
             for player_id, bbox in player_bbox.items():
+                # if player_id != 1 or player_id != 2:
+                  #  continue
                 foot_position = get_foot_position(bbox)
 
                 # Get The closest keypoint in pixels

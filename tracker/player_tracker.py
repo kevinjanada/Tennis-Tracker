@@ -8,7 +8,7 @@ from utils import get_minimum_distance, find_middle
 
 class PlayerTracker:
     def __init__(self,model_path):
-        self.model = YOLO(model_path)
+        self.model = YOLO(model_path).to('cuda')
 
     def __str__(self):
         return str(self.model)
@@ -43,6 +43,7 @@ class PlayerTracker:
             with open(stub_path,"wb") as f:
                 pickle.dump(player_detections,f)
         return player_detections
+
     def find_player(self,court_keypoints, player_detection):
         player_dict = player_detection
         players = []
@@ -57,6 +58,13 @@ class PlayerTracker:
     def filters_players_only(self, court_keypoints,player_detections):
         new_player_detections = []
         selected_track_ids  = self.find_player(court_keypoints,player_detections[0])
+
+        # Ensure only 2 players are selected and sort them
+        if len(selected_track_ids) > 2:
+            selected_track_ids = sorted(selected_track_ids)[:2]  # Take the first two smallest IDs
+        elif len(selected_track_ids) < 2:
+            raise ValueError("Less than 2 players detected in the initial frame.")
+
         for player_dict in player_detections:
             player_detect = {id: bbox for id,bbox in player_dict.items() if id in selected_track_ids}
             new_player_detections.append(player_detect)

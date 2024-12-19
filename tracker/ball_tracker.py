@@ -5,7 +5,7 @@ import pandas as pd
 
 class BallTracker:
     def __init__(self,model_path):
-        self.model = YOLO(model_path)
+        self.model = YOLO(model_path).to('cuda')
 
     def __str__(self):
         return str(self.model)

@@ -14,34 +14,37 @@ import constants
 
 def main():
     # Read video
-    input_path = 'data/test_input_video.mp4'
-    video_frames = read_video(input_path)
+    # input_path = 'data/test_input_video.mp4'
+    input_path = 'data/tennis-video.mp4'
+    video_frames = read_video(input_path, 500)
     cwd = os.getcwd()
     # detect court keypoints
-    court_model_path = os.path.join(cwd,'saved_models\KEYPOINTSMODEL\keypoints2.pth')
+    court_model_path = os.path.join(cwd,'saved_models/KEYPOINTSMODEL/keypoints2.pth')
     court_detector = CourtLineDetector(court_model_path)
     court_keypoints = court_detector.predict(video_frames[0])
 
     # track player
-    player_tracker_stub = '.\saved_models\PLAYER_TRACK'  # stub path to save the player tracker
+    player_tracker_stub = './saved_models/PLAYER_TRACK'  # stub path to save the player tracker
     if len(os.listdir(player_tracker_stub)) == 1:  # check if there is already a tracker
         read_from_stub = False
     else:
         read_from_stub = True 
     player_tracker_stub = os.path.join(player_tracker_stub,'player_tracker.pkl')
-    player_model_path = os.path.join(cwd,'saved_models\PLAYER_TRACK\yolov8x.pt')
+    player_model_path = os.path.join(cwd,'saved_models/PLAYER_TRACK/yolov8x.pt')
     player_tracker = PlayerTracker(player_model_path)
     player_detections = player_tracker.detect_frames(video_frames,read_from_stub,player_tracker_stub)
     player_detections = player_tracker.filters_players_only(court_keypoints,player_detections)
 
+    print("Player detections", player_detections)
+
     # track ball
-    ball_tracker_stub = '.\saved_models\BALL_TRACK'  # stub path to save the player tracker
+    ball_tracker_stub = './saved_models/BALL_TRACK'  # stub path to save the player tracker
     if len(os.listdir(ball_tracker_stub)) == 1:  # check if there is already a tracker
         read_from_stub = False
     else:
         read_from_stub = True 
     ball_tracker_stub = os.path.join(ball_tracker_stub,'ball_tracker.pkl')
-    ball_model_path = os.path.join(cwd,'saved_models\BALL_TRACK\yolo5_last.pt')
+    ball_model_path = os.path.join(cwd,'saved_models/BALL_TRACK/yolo5_last.pt')
     ball_tracker = BallTracker(ball_model_path)
     ball_detections = ball_tracker.detect_frames(video_frames,read_from_stub,ball_tracker_stub)
     ball_detections = ball_tracker.interpolate_missing_ball_positions(ball_detections)
